@@ -41,8 +41,8 @@ impl VM {
             let instruction = self.chunks.code[self.ip];
             self.ip += 1;
             match instruction {
-                OpCode::OpConstant(index) => {
-                    self.stack.push(self.chunks.constants[index]);
+                OpCode::OpConstant(value) => {
+                    self.stack.push(value);
                 }
                 OpCode::OpNegate => {
                     let popped = self.stack.pop().expect("Stack is not empty");

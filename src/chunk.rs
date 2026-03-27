@@ -1,6 +1,6 @@
 #[derive(Debug, Clone, Copy)]
 pub enum OpCode {
-    OpConstant(usize),
+    OpConstant(isize),
     OpNegate,
     OpAdd,
     OpSubtract,
@@ -18,7 +18,7 @@ pub struct Chunk {
     pub code: Vec<OpCode>,
     pub lines: Vec<usize>,
     pub lines_repeat: Vec<usize>,
-    pub constants: Vec<Int>,
+    //pub constants: Vec<Int>,
 }
 
 impl Chunk {
@@ -27,7 +27,7 @@ impl Chunk {
             code: vec![],
             lines: vec![],
             lines_repeat: vec![],
-            constants: vec![],
+            //constants: vec![],
         }
     }
 
@@ -46,10 +46,10 @@ impl Chunk {
         }
     }
 
-    pub fn add_constant(&mut self, value: Int) -> usize {
-        self.constants.push(value);
-        self.constants.len() - 1
-    }
+    //pub fn add_constant(&mut self, value: Int) -> usize {
+    //    self.constants.push(value);
+    //    self.constants.len() - 1
+    //}
 
     pub fn disassemble(&self, name: &str) {
         println!("== {} ==", name);
@@ -92,8 +92,8 @@ impl Chunk {
             OpCode::OpReturn => {
                 println!("OP_RETURN");
             }
-            OpCode::OpConstant(index) => {
-                println!("OP_CONSTANT {:04} {}", index, self.constants[index]);
+            OpCode::OpConstant(value) => {
+                println!("OP_CONSTANT {:8}", value);
             }
             OpCode::OpNegate => {
                 println!("OP_NEGATE");
