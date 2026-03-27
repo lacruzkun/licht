@@ -1,0 +1,93 @@
+struct Color
+    r: naturals
+    g: naturals
+    b: naturals
+end
+
+struct Circle
+    cx: real
+    cy: real
+    radius: real
+    color: Color
+
+    fn contains(self: Circle, px: real, py: real) do -> bool
+        dx = px - self.cx : real
+        dy = py - self.cy : real
+
+        dx * dx + dy * dy <= self.radius * self.radius
+    end
+end
+
+struct Square
+    x: real
+    y: real
+    size: real
+    color: Color
+
+    fn contains(self: Square, px: real, py: real) do -> bool
+        if px >= self.x do
+            if px <= self.x + self.size do
+                if py >= self.y do
+                    py <= self.y + self.size
+                else
+                    false
+                end
+            else
+                false
+            end
+        else
+            false
+        end
+    end
+end
+
+fn color_at(px: real, py: real, circle: Circle, square: Square, bg: Color) do -> Color
+    if circle.contains(px, py) do
+        circle.color
+    else
+        if square.contains(px, py) do
+            square.color
+        else
+            bg
+        end
+    end
+end
+
+fn main do
+    width = 320 : naturals
+    height = 200 : naturals
+
+    bg = r:20 g:20 b:35 : Color
+    red = r:220 g:60 b:60 : Color
+    green = r:80 g:200 b:120 : Color
+
+    circle = cx:100.0 cy:90.0 radius:45.0 color:red : Circle
+    square = x:170.0 y:50.0 size:70.0 color:green : Square
+
+    print "P3"
+    print "320 200"
+    print "255"
+
+    y = 0 : naturals
+    while y < height do
+        x = 0 : naturals
+        while x < width do
+            px = x : real
+            py = y : real
+
+            c = color_at(px, py, circle, square, bg)
+
+            print c.r
+            print " "
+            print c.g
+            print " "
+            print c.b
+            print " "
+
+            x = x + 1
+        end
+
+        print "\n"
+        y = y + 1
+    end
+end
