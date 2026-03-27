@@ -1,12 +1,11 @@
 use crate::chunk::Chunk;
+use crate::chunk::Int;
 use crate::chunk::OpCode;
-use crate::chunk::Int
 
 pub struct VM {
     chunks: Chunk,
     ip: usize,
     stack: Vec<Int>,
-    stack_top: usize,
 }
 
 pub enum InterpretResult {
@@ -21,7 +20,6 @@ impl VM {
             chunks: Chunk::new(),
             ip: 0,
             stack: vec![],
-            stack_top: 0,
         }
     }
 
@@ -33,17 +31,63 @@ impl VM {
 
     fn run(&mut self) -> InterpretResult {
         loop {
+            print!("            ");
+            for slot in &self.stack {
+                print!("[ {} ]", slot);
+            }
+            println!();
+
             self.chunks.disassemble_instruction(self.ip);
             let instruction = self.chunks.code[self.ip];
             self.ip += 1;
             match instruction {
-                OpCode::OpConstant(value) => {
-                    println!("{}", value);
+                OpCode::OpConstant(index) => {
+                    self.stack.push(self.chunks.constants[index]);
+                }
+                OpCode::OpNegate => {
+                    let popped = self.stack.pop().expect("Stack is not empty");
+                    self.stack.push(-popped);
                 }
                 OpCode::OpReturn => {
                     return InterpretResult::InterpretOk;
                 }
+                OpCode::OpAdd => {
+                    self.binary_op('+');
+                }
+                OpCode::OpSubtract => {
+                    self.binary_op('-');
+                }
+                OpCode::OpMultiply => {
+                    self.binary_op('*');
+                }
+                OpCode::OpDivide => {
+                    self.binary_op('/');
+                }
+                OpCode::OpModulo => {
+                    self.binary_op('%');
+                }
+                OpCode::OpExp => {
+                    self.binary_op('^');
+                }
             }
         }
+    }
+    fn binary_op(&mut self, op: char) {
+        let b = self.stack.pop().expect("Stack is not empty");
+        let a = self.stack.pop().expect("Stack is not empty");
+        match op {
+            '+' => self.stack.push(a + b),
+            '-' => self.stack.push(a - b),
+            '*' => self.stack.push(a * b),
+            '/' => self.stack.push(a / b),
+            '%' => self.stack.push(a % b),
+            '^' => {
+                if b < 0 {
+                    println!("raising to a negative interger can result in fractions but variable is of type Int");
+                }
+                self.stack.push(a.pow(b as u32));
+            }
+            _ => {}
+        };
     }
 }

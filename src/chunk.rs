@@ -1,6 +1,13 @@
 #[derive(Debug, Clone, Copy)]
 pub enum OpCode {
     OpConstant(usize),
+    OpNegate,
+    OpAdd,
+    OpSubtract,
+    OpMultiply,
+    OpDivide,
+    OpModulo,
+    OpExp,
     OpReturn,
 }
 
@@ -9,9 +16,9 @@ pub type Int = isize;
 #[derive(Clone)]
 pub struct Chunk {
     pub code: Vec<OpCode>,
-    lines: Vec<usize>,
-    lines_repeat: Vec<usize>,
-    constants: Vec<Int>,
+    pub lines: Vec<usize>,
+    pub lines_repeat: Vec<usize>,
+    pub constants: Vec<Int>,
 }
 
 impl Chunk {
@@ -85,8 +92,29 @@ impl Chunk {
             OpCode::OpReturn => {
                 println!("OP_RETURN");
             }
-            OpCode::OpConstant(offset) => {
-                println!("OP_CONSTANT {:04} {}", offset, self.constants[offset]);
+            OpCode::OpConstant(index) => {
+                println!("OP_CONSTANT {:04} {}", index, self.constants[index]);
+            }
+            OpCode::OpNegate => {
+                println!("OP_NEGATE");
+            }
+            OpCode::OpAdd => {
+                println!("OP_ADD");
+            }
+            OpCode::OpSubtract => {
+                println!("OP_SUBTRACT");
+            }
+            OpCode::OpMultiply => {
+                println!("OP_MULTIPLY");
+            }
+            OpCode::OpDivide => {
+                println!("OP_DIVIDE");
+            }
+            OpCode::OpModulo => {
+                println!("OP_MODULO");
+            }
+            OpCode::OpExp => {
+                println!("OP_EXP");
             }
         }
     }
