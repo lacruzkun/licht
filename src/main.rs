@@ -4,9 +4,9 @@ use crate::vm::VM;
 use std::env;
 
 mod chunk;
-mod vm;
 mod compiler;
 mod scanner;
+mod vm;
 
 fn main() {
     let mut args = env::args();
@@ -14,7 +14,7 @@ fn main() {
 
     if args.len() == 1 {
         vm.repl();
-    } else if args.len() == 2{
+    } else if args.len() == 2 {
         vm.run_file(&args.nth(2).unwrap());
     } else {
         print_help();
@@ -22,7 +22,6 @@ fn main() {
     }
 }
 
-
 fn print_help() {
     println!("Usage: licht [path]");
-} 
+}

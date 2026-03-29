@@ -1,22 +1,23 @@
 use crate::scanner::Scanner;
+use crate::scanner::TokenKind;
 
-pub fn comipile(source: String){
-    let scanner = Scanner::new();
+pub fn compile(source: String) {
+    let mut scanner = Scanner::new(&source);
 
-    let line = -1;
+    let mut line = 0;
 
     loop {
         let token = scanner.scan_token();
-        if token.line != line {
+        if token.line != line || token.line == 0 {
             print!("{:4} ", token.line);
             line = token.line;
-        }else {
+        } else {
             print!("    |");
         }
 
-        println!("{:?} {}", token.type, token.value);
+        println!("{:?}", token.kind);
 
-        if token.type == TokenKind::EOF{
+        if token.kind == TokenKind::EOF {
             break;
         }
     }

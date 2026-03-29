@@ -95,23 +95,25 @@ impl VM {
         loop {
             print!("<<{:2}>> ", line_number);
             io::stdout().flush().unwrap();
-            let line = read_line().expect("succeful line");
+            let mut line = read_line().expect("succeful line");
             println!();
+            line = line.trim().to_string();
             line_number += 1;
             self.interpret(line);
         }
     }
 
-    pub fn run_file(&self, file: &str){
-    }
-
+    pub fn run_file(&self, file: &str) {}
 }
 
 fn read_line() -> Result<String, ()> {
     let mut buffer = String::new();
-    match io::stdin().read_line(&mut buffer){
-        Ok(_) => {},
-        Err(e) => {println!("{e}"); std::process::exit(0)},
+    match io::stdin().read_line(&mut buffer) {
+        Ok(_) => {}
+        Err(e) => {
+            println!("{e}");
+            std::process::exit(0)
+        }
     };
     Ok(buffer)
 }
