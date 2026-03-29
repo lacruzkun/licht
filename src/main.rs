@@ -5,15 +5,17 @@ use std::env;
 
 mod chunk;
 mod vm;
+mod compiler;
+mod scanner;
 
 fn main() {
-    let args = env::args();
+    let mut args = env::args();
     let mut vm = VM::new();
 
     if args.len() == 1 {
-        repl();
+        vm.repl();
     } else if args.len() == 2{
-        vm.run_file(args[1]);
+        vm.run_file(&args.nth(2).unwrap());
     } else {
         print_help();
         std::process::exit(65);
