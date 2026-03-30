@@ -1,3 +1,5 @@
+use std::str::Chars;
+
 pub struct Scanner<'a> {
     file: &'a str,
     start: usize,
@@ -31,7 +33,11 @@ pub enum TokenKind {
     Dot,
     Range, //..
     Minus,
-    Arrow, //->
+    Arrow,    //->
+    Pipe,     // |
+    PipePipe, // ||
+    Amp,      // &
+    AmpAmp,   // &&
 
     //Literal
     Identifier,
@@ -51,6 +57,10 @@ pub enum TokenKind {
     SelfKeyword,
     While,
     Let,
+    Do,
+    End,
+    IntKeyword,
+    RealKeyword,
 
     Error(String),
     EOF,
@@ -100,7 +110,8 @@ impl<'a> Scanner<'a> {
             '%' => return self.make_token(TokenKind::Percent),
             '^' => return self.make_token(TokenKind::Caret),
             '"' => return self.string(),
-            '0'..'9' => return self.number(),
+            '0'..='9' => return self.number(),
+            'a'..='z' | 'A'..='Z' | '_' => return self.identifier(),
             // double characters
             '!' => {
                 let next = self.peek();
@@ -150,6 +161,24 @@ impl<'a> Scanner<'a> {
                 }
                 return self.make_token(TokenKind::Minus);
             }
+            '|' => {
+                let next = self.peek();
+                if next == '|' {
+                    let _ = self.advance();
+                    return self.make_token(TokenKind::PipePipe);
+                }
+                return self.make_token(TokenKind::Pipe);
+            }
+            '&' => {
+                let next = self.peek();
+                if next == '&' {
+                    let _ = self.advance();
+                    return self.make_token(TokenKind::AmpAmp);
+                }
+                return self.make_token(TokenKind::Amp);
+            }
+
+
             _ => (),
         }
 
@@ -245,17 +274,21 @@ impl<'a> Scanner<'a> {
         let s = &self.file[self.start..self.current];
         let s = s.to_string();
         self.advance();
-        return  self.make_token(TokenKind::StringLiteral(s));
+        return self.make_token(TokenKind::StringLiteral(s));
     }
 
-    fn is_digit(&mut self, c: char) -> bool{
+    fn is_digit(&self, c: char) -> bool {
         c <= '9' && c >= '0'
+    }
+
+    fn is_alpha(&self, c: char) -> bool {
+        (c <= 'z' && c >= 'a') || (c <= 'Z' && c >= 'A') || (c == '_')
     }
 
     fn number(&mut self) -> Token {
         self.start = self.current - 1;
         let mut is_real = false;
-        while self.is_digit(self.peek()){
+        while self.is_digit(self.peek()) {
             self.advance();
         }
 
@@ -275,5 +308,70 @@ impl<'a> Scanner<'a> {
         } else {
             return self.make_token(TokenKind::Real(s.parse().expect("should be a float")));
         }
+    }
+
+    fn identifier(&mut self) -> Token {
+        self.start = self.current - 1;
+
+        while self.is_alpha(self.peek()) || self.is_digit(self.peek()) {
+            self.advance();
+        }
+
+        let s = &self.file[self.start..self.current];
+        return self.make_token(self.identifier_type(s));
+    }
+
+    fn identifier_type(&self, s: &str) -> TokenKind {
+        let mut s = s.chars();
+        match s.next().unwrap_or('\0') {
+            's' => {
+                match s.next().unwrap_or('\0') {
+                    't' => return self.check_keyword(s, "ruct", TokenKind::Struct),
+                    'e' => return self.check_keyword(s, "lf", TokenKind::SelfKeyword),
+                    _ => (),
+                };
+            }
+            'i' => {
+                match s.next().unwrap_or('\0') {
+                    'f' => return TokenKind::If,
+                    'n' => match s.next().unwrap_or('\0') {
+                        '\0' =>
+                            return TokenKind::In,
+                            't' => return TokenKind::IntKeyword,
+                            _ => ()
+                    }
+                    _ => (),
+                };
+            }
+            'e' => match s.next().unwrap_or('\0') {
+                'l' => return self.check_keyword(s, "se", TokenKind::Else),
+                'n' => return self.check_keyword(s, "d", TokenKind::End),
+                _ => (),
+            },
+            't' => return self.check_keyword(s, "rue", TokenKind::True),
+            'f' => {
+                match s.next().unwrap_or('\0') {
+                    'a' => return self.check_keyword(s, "lse", TokenKind::False),
+                    'o' => return self.check_keyword(s, "r", TokenKind::For),
+                    _ => (),
+                }
+            },
+            'p' => return self.check_keyword(s, "roc", TokenKind::Proc),
+            'w' => return self.check_keyword(s, "hile", TokenKind::While),
+            'l' => return self.check_keyword(s, "et", TokenKind::Let),
+            'd' => return self.check_keyword(s, "o", TokenKind::Do),
+            'r' => return self.check_keyword(s, "eal", TokenKind::RealKeyword),
+            _ => (),
+        }
+        return TokenKind::Identifier;
+    }
+
+    fn check_keyword(&self, iter: Chars, s: &str, t: TokenKind) -> TokenKind {
+        let iter = iter.as_str();
+        if iter == s {
+            return t;
+        }
+
+        return TokenKind::Identifier;
     }
 }
