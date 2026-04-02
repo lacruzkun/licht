@@ -1,6 +1,7 @@
 use crate::chunk::Chunk;
 use crate::chunk::Int;
 use crate::chunk::OpCode;
+use crate::compiler::compile;
 use std::io::{self, Write};
 
 pub struct VM {
@@ -25,8 +26,15 @@ impl VM {
     }
 
     pub fn interpret(&mut self, source: String) -> InterpretResult {
-        crate::compiler::compile(source);
-        InterpretResult::InterpretOk
+        let mut chunk = Chunk::new();
+
+        if !compile(source, &mut chunk){
+            return InterpretResult::InterpretCompileError;
+        }
+
+        self.chunks = chunk;
+        let result = self.run();
+        result
     }
 
     fn run(&mut self) -> InterpretResult {

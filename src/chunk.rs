@@ -1,3 +1,7 @@
+use crate::compiler::Parser;
+use crate::scanner::Token;
+use crate::scanner::TokenKind;
+
 #[derive(Debug, Clone, Copy)]
 pub enum OpCode {
     OpConstant(isize),
@@ -117,5 +121,29 @@ impl Chunk {
                 println!("OP_EXP");
             }
         }
+    }
+
+    fn emit_opcode(&mut self, opcode: OpCode, p: &Parser){
+        self.write(opcode, p.previous.as_ref().unwrap().line);
+    }
+
+    pub fn end_chunk(&mut self, p: &Parser) {
+        self.emit_return(p);
+    }
+
+    fn emit_return(&mut self, p: &Parser) {
+        self.emit_opcode(OpCode::OpReturn, p);
+    }
+
+    fn number(&mut self, p: &Parser){
+        self.emit_constant(p);
+    }
+
+    fn emit_constant(&mut self, p: &Parser) {
+        let TokenKind::Integer(value) = p.previous.clone().unwrap().kind else {
+            std::process::exit(0);
+        };
+
+        self.emit_opcode(OpCode::OpConstant(value), p);
     }
 }

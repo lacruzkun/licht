@@ -7,7 +7,7 @@ pub struct Scanner<'a> {
     line: usize,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum TokenKind {
     //Single Character Tokens
     LeftParen,
@@ -40,9 +40,9 @@ pub enum TokenKind {
     AmpAmp,   // &&
 
     //Literal
-    Identifier,
+    Identifier(String),
     StringLiteral(String),
-    Integer(i32),
+    Integer(isize),
     Real(f64),
 
     //keywords
@@ -66,6 +66,7 @@ pub enum TokenKind {
     EOF,
 }
 
+#[derive(Clone, PartialEq)]
 pub struct Token {
     pub kind: TokenKind,
     //value: String,
@@ -199,7 +200,7 @@ impl<'a> Scanner<'a> {
         t
     }
 
-    fn advance(&mut self) -> char {
+    pub fn advance(&mut self) -> char {
         self.current += 1;
         let r = &self.file[self.current - 1..self.current];
         let mut r = r.chars();
@@ -363,7 +364,9 @@ impl<'a> Scanner<'a> {
             'r' => return self.check_keyword(s, "eal", TokenKind::RealKeyword),
             _ => (),
         }
-        return TokenKind::Identifier;
+        let s = &self.file[self.start..self.current];
+        let s = s.to_string();
+        return TokenKind::Identifier(s);
     }
 
     fn check_keyword(&self, iter: Chars, s: &str, t: TokenKind) -> TokenKind {
@@ -372,6 +375,8 @@ impl<'a> Scanner<'a> {
             return t;
         }
 
-        return TokenKind::Identifier;
+        let s = &self.file[self.start..self.current];
+        let s = s.to_string();
+        return TokenKind::Identifier(s);
     }
 }
