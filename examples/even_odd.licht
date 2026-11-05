@@ -1,0 +1,8 @@
+// An if/else used as a value, and a for loop over a range
+fn describe(n: int) -> string {
+    if n % 2 == 0 { "even" } else { "odd" }
+}
+
+for i in range(1, 6) {
+    print(describe(i));
+}
