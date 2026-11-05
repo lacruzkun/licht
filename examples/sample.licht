@@ -1,0 +1,46 @@
+// Licht sample program
+
+fn add(x: int, y: int) -> int {
+    x + y
+}
+
+fn abs(n: int) -> int {
+    if n < 0 {
+        return -n;
+    }
+    n
+}
+
+let total = add(3, 4);
+let name = "Licht";
+let pi = 3.14159;
+let is_ready = true;
+let can_run = is_ready && pi > 3.0;
+
+if total > 5 {
+    print("big");
+} else {
+    print("small");
+}
+
+for i in range(0, 10) {
+    print(i);
+}
+
+fn is_even(n: int) -> bool {
+    n % 2 == 0
+}
+
+fn double(n: int) -> int {
+    n * 2
+}
+
+let numbers = [1, 2, 3, 4, 5, 6];
+let evens = filter(is_even, numbers);
+let doubled = map(double, numbers);
+
+print(evens);
+print(doubled);
+
+let contents = read_file("data.txt");
+write_file("out.txt", contents);

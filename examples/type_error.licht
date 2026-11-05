@@ -1,0 +1,7 @@
+// The type checker rejects this before anything runs, so "hello" is never printed.
+fn add(x: int, y: int) -> int {
+    x + y
+}
+
+print("hello");
+let total = add(3, "four");

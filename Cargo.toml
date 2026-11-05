@@ -1,6 +1,17 @@
 [package]
 name = "licht"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+description = "Licht: a minimal, beginner-oriented language with a tree-walking interpreter"
 
+# No external crates: the lexer, parser, type checker and evaluator
+# are all written by hand on top of the Rust standard library.
 [dependencies]
+
+[lib]
+name = "licht"
+path = "src/lib.rs"
+
+[[bin]]
+name = "licht"
+path = "src/main.rs"
